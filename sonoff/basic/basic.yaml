@@ -1,3 +1,5 @@
+# Author by airijia.com
+# Basic 模块基本功能(上电关)
 substitutions:
   # 把这三项改成你自己的设置
   hostname: '666'
