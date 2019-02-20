@@ -1,5 +1,5 @@
 # Author by airijia.com
-# Basic 模块基本功能(上电关)
+# Basic 模块基本功能(上电关) IO14/2 接物理开关
 substitutions:
   # 把这三项改成你自己的设置
   hostname: '666'
@@ -36,6 +36,21 @@ binary_sensor:
       inverted: True
       mode: INPUT_PULLUP
     on_press:
+      then:
+        - switch.toggle:
+            id: relay_1
+  - platform: gpio
+    id: button_2
+    pin: 
+      # 旧版 14, 新版 2
+      number: 2
+      inverted: True
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle:
+            id: relay_1
+    on_release:
       then:
         - switch.toggle:
             id: relay_1

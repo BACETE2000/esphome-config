@@ -16,6 +16,7 @@ wifi:
   password: $password
   fast_connect: True
 api:
+  reboot_timeout: 0s
 ota:
 logger:
 
