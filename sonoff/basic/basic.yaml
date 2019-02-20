@@ -1,0 +1,38 @@
+substitutions:
+  # 把这三项改成你自己的设置
+  hostname: '666'
+  ssid: 'ssid'
+  password: 'password'
+esphomeyaml:
+  name: $hostname
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+wifi:
+  ssid: $ssid
+  password: $password
+  fast_connect: True
+api:
+ota:
+logger:
+
+status_led:
+  pin:
+    number: 13
+    inverted: True
+switch:
+  - platform: gpio
+    name: $hostname switch_1
+    pin: 12
+    id: relay_1
+binary_sensor:
+  - platform: gpio
+    id: button_1
+    pin:
+      number: 0
+      inverted: True
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle:
+            id: relay_1
