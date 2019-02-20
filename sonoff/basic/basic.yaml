@@ -1,8 +1,8 @@
 substitutions:
   # 把这三项改成你自己的设置
   hostname: '666'
-  ssid: 'ssid'
-  password: 'password'
+  ssid: 'airi'
+  password: 'airijia.com'
 esphomeyaml:
   name: $hostname
   platform: ESP8266

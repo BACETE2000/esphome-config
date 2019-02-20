@@ -1,0 +1,113 @@
+# Author by D调E点
+# 三个开关互锁带物理按键
+# PS: 可以根据样本扩展内容，实现多个互锁，不只三个
+
+substitutions:
+  # 把这三项改成你自己的设置
+  hostname: '666'
+  ssid: 'airi'
+  password: 'airijia.com'
+esphomeyaml:
+  name: $hostname
+  platform: ESP8266
+  board: nodemcuv2
+wifi:
+  ssid: $ssid
+  password: $password
+  fast_connect: True
+api:
+ota:
+logger:
+
+script:
+  - id: my_script
+    then:
+      - switch.turn_off: relay_1
+      - switch.turn_off: relay_2
+      - switch.turn_off: relay_3
+      - lambda: >-
+          id(switch_1).publish_state(false);
+      - lambda: >-
+          id(switch_2).publish_state(false);
+      - lambda: >-
+          id(switch_3).publish_state(false);
+switch:
+  - platform: gpio
+    pin: D3
+    id: relay_1
+  - platform: gpio
+    pin: D5
+    id: relay_2
+  - platform: gpio
+    pin: D6
+    id: relay_3
+  - platform: template
+    name: $hostname one
+    id: switch_1
+    turn_on_action:
+     then:
+       - script.execute: my_script
+       - delay: 0.2s
+       - lambda: >-
+           id(switch_1).publish_state(true);
+       - switch.turn_on: relay_1
+    turn_off_action:
+     then:
+       - switch.turn_off: relay_1
+    optimistic: True
+  - platform: template
+    name: $hostname two
+    id: switch_2
+    turn_on_action:
+     then:
+       - script.execute: my_script
+       - delay: 0.2s
+       - lambda: >-
+           id(switch_2).publish_state(true);
+       - switch.turn_on: relay_2
+    turn_off_action:
+     then: 
+       - switch.turn_off: relay_2
+    optimistic: True
+  - platform: template
+    name: $hostname three
+    id: switch_3
+    turn_on_action:
+     then:
+       - script.execute: my_script
+       - delay: 0.2s
+       - lambda: >-
+           id(switch_3).publish_state(true);
+       - switch.turn_on: relay_3
+    turn_off_action:
+     then:
+       - switch.turn_off: relay_3
+    optimistic: True
+binary_sensor: 
+  - platform: gpio
+    id: button_1
+    pin:
+      number: D7
+      inverted: true
+      mode: INPUT_PULLUP
+    on_click: 
+      then: 
+         - switch.toggle: switch_1
+  - platform: gpio
+    id: button_2
+    pin:
+      number: D8
+      inverted: true
+      mode: INPUT_PULLUP
+    on_click: 
+      then: 
+         - switch.toggle: switch_2
+  - platform: gpio
+    id: button_3
+    pin:
+      number: D9
+      inverted: true
+      mode: INPUT_PULLUP
+    on_click: 
+      then: 
+         - switch.toggle: switch_3
