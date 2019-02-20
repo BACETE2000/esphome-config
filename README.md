@@ -4,7 +4,7 @@ ESPHome 固件配置文件
 
 
 - [英文使用文档](https://esphome.io/)
-- [中文使用文档](http://airijia.com/doc/#/mqtt)
+- [中文使用文档](http://airijia.com/doc/#/esphome/)
 
 
 - [在线编译](http://airijia.com/ctl)
