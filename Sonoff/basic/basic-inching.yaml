@@ -1,0 +1,86 @@
+# Author by airijia.com
+# Basic 模块基本功能(上电关) IO14/2 接物理开关
+substitutions:
+  # 把这三项改成你自己的设置
+  hostname: '666'
+  ssid: 'airi'
+  password: 'airijia.com'
+  # 点动延迟秒数
+  delay: 3s
+esphomeyaml:
+  name: $hostname
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+wifi:
+  ssid: $ssid
+  password: $password
+  fast_connect: True
+api:
+  reboot_timeout: 0s
+ota:
+logger:
+
+
+status_led:
+  pin:
+    number: 13
+    inverted: True
+switch:
+  - platform: gpio
+    pin: 12
+    id: relay_1
+  - platform: template
+    name: $hostname switch_1
+    id: switch_1
+    turn_on_action:
+      then:
+        - switch.turn_on:
+            id: relay_1
+        - delay: $delay
+        - switch.turn_off:
+            id: relay_1
+        - lambda: >-
+            id(switch_1).publish_state(false);
+    turn_off_action:
+      then:
+        - switch.turn_off:
+            id: relay_1
+    optimistic: true
+
+script:
+  - id: inching
+    then:
+      - switch.turn_on:
+          id: relay_1
+      - lambda: >-
+          id(switch_1).publish_state(true);
+      - delay: $delay
+      - switch.turn_off:
+          id: relay_1
+      - lambda: >-
+          id(switch_1).publish_state(false);
+
+binary_sensor:
+  - platform: gpio
+    id: button_0
+    pin:
+      number: 0
+      inverted: True
+      mode: INPUT_PULLUP
+    on_click:
+      then:
+        - script.execute: inching
+  - platform: gpio
+    id: button_14
+    pin: 
+      number: 14
+      inverted: True
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - script.execute: inching
+    on_release:
+      then:
+        - script.execute: inching
+

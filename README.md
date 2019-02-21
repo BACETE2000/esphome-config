@@ -1,4 +1,4 @@
-ESPHome 固件配置文件
+# ESPHome 固件配置文件
 
 用于编译 [ESPHome固件](https://esphome.io/) 的 yaml 配置文件，可自建编译环境编译，也可以[在线编译](http://airijia.com/ctl)
 
