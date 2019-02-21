@@ -1,5 +1,5 @@
 # Author by airijia.com
-# Basic 模块基本功能(上电关) IO14/2 接物理开关
+# Basic 模块 点动功能 IO14/2 接物理开关
 substitutions:
   # 把这三项改成你自己的设置
   hostname: '666'
@@ -7,6 +7,8 @@ substitutions:
   password: 'airijia.com'
   # 点动延迟秒数
   delay: 3s
+  # 旧版 14, 新版 2
+  io: 'GPIO2'
 esphomeyaml:
   name: $hostname
   platform: ESP8266
@@ -72,9 +74,9 @@ binary_sensor:
       then:
         - script.execute: inching
   - platform: gpio
-    id: button_14
+    id: button_2
     pin: 
-      number: 14
+      number: $io
       inverted: True
       mode: INPUT_PULLUP
     on_press:

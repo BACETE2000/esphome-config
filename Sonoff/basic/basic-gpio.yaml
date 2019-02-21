@@ -5,6 +5,8 @@ substitutions:
   hostname: '666'
   ssid: 'airi'
   password: 'airijia.com'
+  # 旧版 14, 新版 2
+  io: 'GPIO2'
 esphomeyaml:
   name: $hostname
   platform: ESP8266
@@ -42,8 +44,7 @@ binary_sensor:
   - platform: gpio
     id: button_2
     pin: 
-      # 旧版 14, 新版 2
-      number: 2
+      number: $io
       inverted: True
       mode: INPUT_PULLUP
     on_press:
