@@ -1,0 +1,30 @@
+substitutions:
+  # 把这三项改成你自己的设置
+  hostname: '666'
+  ssid: 'airi'
+  password: 'airijia.com'
+esphomeyaml:
+  name: $hostname
+  platform: ESP8266
+  board: nodemcuv2
+wifi:
+  ssid: $ssid
+  password: $password
+  fast_connect: True
+  id: wifi
+api:
+  password: ''
+  reboot_timeout: 0s
+ota:
+  password: ''  
+logger:
+i2c:
+  sda: 2
+  scl: 3
+  scan: False
+sensor:
+  - platform: bh1750
+    name: $hostname_illuminance_1
+    address: 0x23
+    resolution:  0.5
+    update_interval:  15s
