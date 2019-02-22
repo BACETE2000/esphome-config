@@ -6,7 +6,7 @@ substitutions:
   ssid: 'airi'
   password: 'airijia.com'
   # 旧版 14, 新版 2
-  io: 'GPIO2'
+  io: '2'
 esphomeyaml:
   name: $hostname
   platform: ESP8266

@@ -1,8 +1,12 @@
+# Author by 麦呆
 substitutions:
   # 把这三项改成你自己的设置
   hostname: '666'
   ssid: 'airi'
   password: 'airijia.com'
+  # SCL 接到esp 的 RX上，sda接到 IO2上
+  sda: '2'
+  scl: '3'
 esphomeyaml:
   name: $hostname
   platform: ESP8266
@@ -19,8 +23,8 @@ ota:
   password: ''  
 logger:
 i2c:
-  sda: 2
-  scl: 3
+  sda: $sda
+  scl: $scl
   scan: False
 sensor:
   - platform: bh1750
