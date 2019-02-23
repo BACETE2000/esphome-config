@@ -1,0 +1,228 @@
+# Author by airijia.com
+# 天气工作站 SSD1306显示屏 + SHT30温湿度 + 彩云天气
+# 需要搭配 https://github.com/plutosherry/caiyun-weather-card 使用
+substitutions:
+  # 把这三项改成你自己的设置
+  hostname: '666'
+  ssid: 'airi'
+  password: 'airijia.com'
+esphome:
+  name: $hostname
+  platform: ESP8266
+  board: nodemcuv2
+wifi:
+  ssid: $ssid
+  password: $password
+  fast_connect: True
+api:
+  reboot_timeout: 0s
+ota:
+logger:
+
+time:
+  - platform: homeassistant
+    id: sntp_time
+    timezone: Asia/Shanghai
+i2c:
+  sda: D2
+  scl: D1
+  scan: False
+sensor:
+  - platform: sht3xd
+    temperature:
+      name: $hostname temperature
+      id: temperature
+    humidity:
+      name: $hostname humidity
+      id: humidity
+    address: 0x44
+    update_interval: 60s
+  - platform: homeassistant
+    entity_id: sensor.now_caiyun_temperature
+    id: now_temperature
+  - platform: homeassistant
+    entity_id: sensor.now_caiyun_aqi
+    id: now_aqi
+text_sensor:
+  - platform: homeassistant
+    entity_id: sensor.caiyun_now_weather
+    id: weather_now
+    on_value:
+      then:
+        lambda: >-
+          const char * weather = x.c_str();
+          const char * weathers [] =
+            {
+              "CLEAR_DAY",
+              "CLEAR_NIGHT",
+              "PARTLY_CLOUDY_DAY",
+              "PARTLY_CLOUDY_NIGHT",
+              "CLOUDY",
+              "RAIN",
+              "SNOW",
+              "WIND",
+              "FOG",
+              "HAZE",
+              "SLEET"
+            };
+          int len = 11;
+          int i;
+
+          for (i = 0; i <len; i ++)
+            {
+              if (strcmp (weather, weathers [ i ]) == 0 )
+              {
+                id(now) = i;
+                break;
+              }
+            };
+image:
+  - file: "mdi:weather-sunny"
+    id: sunny
+    resize: 36x36
+  - file: "mdi:weather-night"
+    id: night
+    resize: 36x36
+  - file: "mdi:weather-partlycloudy"
+    id: partlycloudy
+    resize: 36x36
+  - file: "mdi:weather-windy-variant"
+    id: variant
+    resize: 36x36
+  - file: "mdi:weather-cloudy"
+    id: cloudy
+    resize: 36x36
+  - file: "mdi:weather-rainy"
+    id: rainy
+    resize: 36x36
+  - file: "mdi:weather-snowy"
+    id: snowy
+    resize: 36x36
+  - file: "mdi:weather-windy"
+    id: windy
+    resize: 36x36
+  - file: "mdi:weather-fog"
+    id: fog
+    resize: 36x36
+  - file: "mdi:blur"
+    id: hail
+    resize: 36x36
+  - file: "mdi:weather-snowy-rainy"
+    id: snowyrainy
+    resize: 36x36
+  - file: "mdi:thermometer"
+    id: thermometer
+    resize: 24x24
+  - file: "mdi:water-percent"
+    id: water
+    resize: 24x24
+  - file: "mdi:circle-medium"
+    id: ico
+    resize: 6x6
+  - file: "mdi:circle"
+    id: ic
+    resize: 6x6
+font:
+  - file: "helvetica"
+    id: font_24
+    size: 24
+    glyphs: "0123456789.-°%CAQIna"
+  - file: "helvetica"
+    id: font_16
+    size: 14
+    glyphs: "0123456789:.-°|na"
+globals:
+  - id: page
+    type: int
+  - id: frame
+    type: int
+  - id: now
+    type: int
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3C
+    update_interval: 1s
+    lambda: >-
+
+      it.line(0, 49, 128, 49);
+      it.strftime(0, 50, id(font_16), "%H:%M", id(sntp_time).now());
+      it.image(59, 54, id(page) == 0 ? id(ic) : id(ico));
+      it.image(69, 54, id(page) == 1 ? id(ic) : id(ico));
+      it.printf(128, 50, id(font_16), TextAlign::RIGHT, "%.1f°", temperature);
+
+      switch(id(page)) {
+        case 0:
+          it.image(12, 0, id(thermometer));
+          it.printf(40, 12, id(font_24), "%.1f°C", id(temperature).state);
+          it.image(12, 24, id(water));
+          it.printf(40, 36, id(font_24), "%.1f%%", id(humidity).state);
+          id(frame) += 1;
+          if(id(frame) >= 10){
+            id(page) += 1;
+          }
+          break;
+        case 1:
+          switch(id(now)) {
+            case 0 :
+              it.image(0, 6, id(sunny));
+              break;
+            case 1 :
+              it.image(0, 6, id(night));
+              break;
+            case 2 :
+              it.image(0, 6, id(partlycloudy));
+              break;
+            case 3 :
+              it.image(0, 6, id(variant));
+              break;
+            case 4 :
+              it.image(0, 6, id(cloudy));
+              break;
+            case 5 :
+              it.image(0, 6, id(rainy));
+              break;
+            case 6 :
+              it.image(0, 6, id(snowy));
+              break;
+            case 7 :
+              it.image(0, 6, id(windy));
+              break;
+            case 8 :
+              it.image(0, 6, id(fog));
+              break;
+            case 9 :
+              it.image(0, 6, id(hail));
+              break;
+            case 10 :
+              it.image(0, 6, id(snowyrainy));
+              break;
+          }
+  
+          it.printf(40, 12, id(font_24), "%.1f°C", id(now_temperature).state);
+          it.printf(40, 36, id(font_24), "%.0fAQI", id(now_aqi).state);
+          id(frame) += 1;
+          if(id(frame) >= 20){
+            id(page) = 0;
+            id(frame) = 0;
+          }
+          break;
+      };
+binary_sensor:
+  - platform: gpio
+    id: button_1
+    pin:
+      number: 0
+      inverted: True
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        lambda: >-
+          if(id(page) == 0){
+            id(page) = 1;
+            id(frame) = 11;
+          }
+          else if(id(page) == 1){
+            id(page) = 0;
+            id(frame) = 0;
+          }

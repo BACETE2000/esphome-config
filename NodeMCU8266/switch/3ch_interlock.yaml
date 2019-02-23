@@ -7,7 +7,7 @@ substitutions:
   hostname: '666'
   ssid: 'airi'
   password: 'airijia.com'
-esphomeyaml:
+esphome:
   name: $hostname
   platform: ESP8266
   board: nodemcuv2

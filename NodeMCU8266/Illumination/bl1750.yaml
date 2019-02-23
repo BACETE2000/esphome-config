@@ -7,7 +7,7 @@ substitutions:
   # SCL 接到esp 的 RX上，sda接到 IO2上
   sda: '2'
   scl: '3'
-esphomeyaml:
+esphome:
   name: $hostname
   platform: ESP8266
   board: nodemcuv2
