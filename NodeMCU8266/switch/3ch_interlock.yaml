@@ -7,6 +7,8 @@ substitutions:
   hostname: '666'
   ssid: 'airi'
   password: 'airijia.com'
+  # 互锁延迟
+  delay: '0.2s'
 esphome:
   name: $hostname
   platform: ESP8266
@@ -48,7 +50,7 @@ switch:
     turn_on_action:
      then:
        - script.execute: my_script
-       - delay: 0.2s
+       - delay: $delay
        - lambda: >-
            id(switch_1).publish_state(true);
        - switch.turn_on: relay_1
@@ -62,7 +64,7 @@ switch:
     turn_on_action:
      then:
        - script.execute: my_script
-       - delay: 0.2s
+       - delay: $delay
        - lambda: >-
            id(switch_2).publish_state(true);
        - switch.turn_on: relay_2
@@ -76,7 +78,7 @@ switch:
     turn_on_action:
      then:
        - script.execute: my_script
-       - delay: 0.2s
+       - delay: $delay
        - lambda: >-
            id(switch_3).publish_state(true);
        - switch.turn_on: relay_3
