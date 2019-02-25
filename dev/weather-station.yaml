@@ -8,7 +8,7 @@ substitutions:
   password: 'airijia.com'
   # 翻页延迟
   delay: 10s
-  # 屏幕角度，排针侧向上0°，排针侧向下180°
+  # 屏幕旋转读数，排针侧向上为 0°，排针侧向下为 180°
   rotation: 0°
 esphome:
   name: $hostname
