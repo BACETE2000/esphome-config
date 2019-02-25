@@ -9,7 +9,7 @@ substitutions:
   # 翻页延迟
   delay: 10s
   # 屏幕角度，排针侧向上0°，排针侧向下180°
-  rotation: 180°
+  rotation: 0°
 esphome:
   name: $hostname
   platform: ESP8266
@@ -131,7 +131,7 @@ font:
     size: 24
     glyphs: "0123456789.-°%CAQIna"
   - file: "helvetica"
-    id: font_16
+    id: font_14
     size: 14
     glyphs: "0123456789:.-°|na"
 globals:
@@ -148,8 +148,8 @@ display:
       - id: page1
         lambda: >-
           it.line(0, 49, 128, 49);
-          it.strftime(0, 50, id(font_16), "%H:%M", id(hass_time).now());
-          it.printf(128, 50, id(font_16), TextAlign::RIGHT, "%.1f°", temperature);
+          it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
+          it.printf(128, 51, id(font_14), TextAlign::RIGHT, "%.1f°", temperature);
           it.image(59, 54, id(ic));
           it.image(69, 54, id(ico));
 
@@ -160,8 +160,8 @@ display:
       - id: page2
         lambda: >-
           it.line(0, 49, 128, 49);
-          it.strftime(0, 50, id(font_16), "%H:%M", id(hass_time).now());
-          it.printf(128, 50, id(font_16), TextAlign::RIGHT, "%.1f°", temperature);
+          it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
+          it.printf(128, 51, id(font_14), TextAlign::RIGHT, "%.1f°", temperature);
           it.image(59, 54, id(ico));
           it.image(69, 54, id(ic));
 
