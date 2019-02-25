@@ -141,7 +141,7 @@ display:
   - platform: ssd1306_i2c
     model: "SSD1306 128x64"
     address: 0x3C
-    update_interval: 1s
+    update_interval: 60s
     rotation: $rotation
     id: display
     pages:
@@ -207,6 +207,7 @@ interval:
   - interval: $delay
     then:
       - display.page.show_next: display
+      - component.update: display
 binary_sensor:
   - platform: gpio
     id: button_1
@@ -217,3 +218,4 @@ binary_sensor:
     on_click:
       then:
         - display.page.show_next: display
+        - component.update: display
