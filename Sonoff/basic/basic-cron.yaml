@@ -1,0 +1,58 @@
+# Author by laoxiang
+# Basic 模块 定时开关功能
+# 开关打开20秒，然后关闭100秒，循环
+# 参考使用文档 http://airijia.com/doc#/esphome/components/time?id=on_time
+substitutions:
+  # 把这三项改成你自己的设置
+  hostname: '666'
+  ssid: 'airi'
+  password: 'airijia.com'
+  # 每隔2分钟第0秒打开
+  cron_on: '0 /2 * * * *'
+  # 每隔2分钟的第20秒关闭
+  cron_off: '20 /2 * * * *'
+esphome:
+  name: $hostname
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+wifi:
+  ssid: $ssid
+  password: $password
+  fast_connect: True
+api:
+  reboot_timeout: 0s
+ota:
+logger:
+
+status_led:
+  pin:
+    number: 13
+    inverted: True
+switch:
+  - platform: gpio
+    name: $hostname switch_1
+    pin: 12
+    id: relay_1
+binary_sensor:
+  - platform: gpio
+    id: button_1
+    pin:
+      number: 0
+      inverted: True
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle:
+            id: relay_1
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: Asia/Shanghai
+    on_time:
+      - cron: $cron_on 
+        then:
+          - switch.turn_on: relay_1
+      - cron: $cron_off
+        then:
+          - switch.turn_off: relay_1
