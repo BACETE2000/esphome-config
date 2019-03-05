@@ -23,20 +23,37 @@ i2c:
   sda: D2
   scl: D1
   scan: False
+globals:
+  - id: sea
+    # 海平面大气压 单位hPa
+    type: float
+    initial_value: '1013.25'
+  - id: mw
+    # 水的摩尔质量 单位g/mol
+    type: float
+    initial_value: '18.01534'
+  - id: r
+    # 通用气体常数 单位J/mol/K
+    type: float
+    initial_value: '8.31447215'
 sensor:
   # HTU21D
   - platform: htu21d
     temperature:
       name: $hostname htu21d temperature
+      id: htu21d_temperature
     humidity:
       name: $hostname humidity
+      id: htu21d_humidity
     update_interval: 60s
   # BMP180
   - platform: bmp085
     temperature:
       name: $hostname bmp180 temperature
+      id: bmp180_temperature
     pressure:
       name: $hostname pressure
+      id: bmp180_pressure
     address: 0x77
     update_interval: 60s
   # BH1750
@@ -45,3 +62,17 @@ sensor:
     address: 0x23
     resolution: 0.5
     update_interval: 60s
+  - platform: template
+    # 海拔高度
+    name: $hostname Altitude
+    lambda: >-
+      return ((id(htu21d_temperature).state + 273.15) / 0.0065) * (powf((id(sea) / id(bmp180_pressure).state), 0.190234) - 1); // in meter
+    update_interval: 15s
+  - platform: template
+    # 绝对湿度
+    name: $hostname Absolute Humidity
+    lambda: >-
+      return (6.112 * powf(2.718281828, (17.67 * id(htu21d_temperature).state) / \
+        (id(htu21d_temperature).state + 243.5)) * id(htu21d_humidity).state * id(mw)) / \
+        ((273.15 + id(htu21d_temperature).state) * id(r)); // in grams/m^3
+    update_interval: 15s
