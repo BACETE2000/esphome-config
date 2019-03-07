@@ -1,0 +1,154 @@
+# Author by airijia.com
+# 三合一气象传感器模块 HTU21D+BMP180+BH1750
+# + ssd1306 OLED 显示屏
+# 组装说明 http://airijia.com/doc/#/diy/nodemcu/3in1
+substitutions:
+  # 把这三项改成你自己的设置
+  hostname: '666'
+  ssid: 'airi'
+  password: 'airijia.com'
+  # 翻页延迟
+  delay: 5s
+  # 屏幕旋转读数，排针侧向上为 0°，排针侧向下为 180°
+  rotation: 180°
+esphome:
+  name: $hostname
+  platform: ESP8266
+  board: nodemcuv2
+wifi:
+  ssid: $ssid
+  password: $password
+  fast_connect: True
+api:
+  reboot_timeout: 0s
+ota:
+logger:
+
+i2c:
+  sda: D2
+  scl: D1
+  scan: False
+time:
+  - platform: homeassistant
+    # hass 的时间
+    id: hass_time
+    timezone: Asia/Shanghai
+
+sensor:
+  # HTU21D
+  - platform: htu21d
+    temperature:
+      name: $hostname htu21d temperature
+      id: htu21d_temperature
+    humidity:
+      name: $hostname humidity
+      id: htu21d_humidity
+    update_interval: 60s
+  # BMP180
+  - platform: bmp085
+    temperature:
+      name: $hostname bmp180 temperature
+      id: bmp180_temperature
+    pressure:
+      name: $hostname pressure
+      id: bmp180_pressure
+    address: 0x77
+    update_interval: 60s
+  # BH1750
+  - platform: bh1750
+    name: $hostname illuminance
+    id: bh1750_illuminance
+    address: 0x23
+    resolution: 0.5
+    update_interval: 60s
+image:
+  - file: "mdi:thermometer"
+    id: thermometer
+    resize: 24x24
+  - file: "mdi:water-percent"
+    id: water
+    resize: 24x24
+  - file: "mdi:gauge"
+    id: pressure
+    resize: 24x24
+  - file: "mdi:brightness-5.png"
+    id: brightness
+    resize: 24x24
+font:
+  - file: "arialbd"
+    id: font_48
+    size: 48
+  - file: "helvetica"
+    id: font_24
+    size: 24
+    # glyphs: "0123456789.-°%CAQIna"
+  - file: "helvetica"
+    id: font_14
+    size: 14
+    # glyphs: "0123456789:.-°|na"
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3C
+    update_interval: 60s
+    rotation: $rotation
+    id: display
+    pages:
+      - id: page1
+        # 时间
+        lambda: >-
+          it.line(0, 49, 128, 49);
+          it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
+          it.printf(128, 51, id(font_14), TextAlign::RIGHT, "%.1f°", htu21d_temperature);
+          it.filled_circle(54, 57, 3);
+          it.circle(64, 57, 3);
+          it.circle(74, 57, 3);
+
+          it.strftime(64, 24, id(font_48), TextAlign::CENTER, "%H:%M", id(hass_time).now());
+
+      - id: page2
+        # 温湿度
+        lambda: >-
+          it.line(0, 49, 128, 49);
+          it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
+          it.printf(128, 51, id(font_14), TextAlign::RIGHT, "%.1f°", id(htu21d_temperature).state);
+          it.circle(54, 57, 3);
+          it.filled_circle(64, 57, 3);
+          it.circle(74, 57, 3);
+
+          it.image(6, 0, id(thermometer));
+          it.printf(37, 12, id(font_24), "%.1f°C", id(htu21d_temperature).state);
+          it.image(6, 24, id(water));
+          it.printf(37, 36, id(font_24), "%.1f%%", id(htu21d_humidity).state);
+      - id: page3
+        # 大气压 光强
+        lambda: >-
+          it.line(0, 49, 128, 49);
+          it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
+          it.printf(128, 51, id(font_14), TextAlign::RIGHT, "%.1f°", id(htu21d_temperature).state);
+          it.circle(54, 57, 3);
+          it.circle(64, 57, 3);
+          it.filled_circle(74, 57, 3);
+
+          it.image(6, 0, id(pressure));
+          it.printf(37, 12, id(font_24), "%.1f", id(bmp180_pressure).state);
+          it.image(6, 24, id(brightness));
+          it.printf(37, 36, id(font_24), "%.1f", id(bh1750_illuminance).state);
+interval:
+  # 自动翻页
+  - interval: $delay
+    then:
+      - display.page.show_next: display
+      - component.update: display
+binary_sensor:
+  # FLASH(IO0) 按钮翻页
+  - platform: gpio
+    id: button_1
+    pin:
+      number: 0
+      inverted: True
+      mode: INPUT_PULLUP
+    on_click:
+      then:
+        - display.page.show_next: display
+        - component.update: display

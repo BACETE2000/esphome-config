@@ -1,6 +1,8 @@
 # Author by airijia.com
-# 天气工作站 SSD1306显示屏 + SHT30温湿度 + 彩云天气
+# 三合一气象传感器模块 HTU21D+BMP180+BH1750
+# + ssd1306 OLED 显示屏 + 彩云天气
 # 需要搭配 https://github.com/plutosherry/caiyun-weather-card 使用
+# 组装说明 http://airijia.com/doc/#/diy/nodemcu/3in1
 substitutions:
   # 把这三项改成你自己的设置
   hostname: '666'
@@ -9,7 +11,7 @@ substitutions:
   # 翻页延迟
   delay: 10s
   # 屏幕旋转读数，排针侧向上为 0°，排针侧向下为 180°
-  rotation: 0°
+  rotation: 180°
 esphome:
   name: $hostname
   platform: ESP8266
@@ -23,23 +25,41 @@ api:
 ota:
 logger:
 
-time:
-  - platform: homeassistant
-    id: hass_time
-    timezone: Asia/Shanghai
 i2c:
   sda: D2
   scl: D1
   scan: False
+time:
+  - platform: homeassistant
+    # hass 的时间
+    id: hass_time
+    timezone: Asia/Shanghai
+
 sensor:
-  - platform: sht3xd
+  # HTU21D
+  - platform: htu21d
     temperature:
-      name: $hostname temperature
-      id: temperature
+      name: $hostname htu21d temperature
+      id: htu21d_temperature
     humidity:
       name: $hostname humidity
-      id: humidity
-    address: 0x44
+      id: htu21d_humidity
+    update_interval: 60s
+  # BMP180
+  - platform: bmp085
+    temperature:
+      name: $hostname bmp180 temperature
+      id: bmp180_temperature
+    pressure:
+      name: $hostname pressure
+      id: bmp180_pressure
+    address: 0x77
+    update_interval: 60s
+  # BH1750
+  - platform: bh1750
+    name: $hostname illuminance
+    address: 0x23
+    resolution: 0.5
     update_interval: 60s
   - platform: homeassistant
     entity_id: sensor.now_caiyun_temperature
@@ -140,6 +160,20 @@ display:
     id: display
     pages:
       - id: page1
+        # 时间
+        lambda: >-
+          it.line(0, 49, 128, 49);
+          it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
+          it.printf(128, 51, id(font_14), TextAlign::RIGHT, "%.1f°", temperature);
+          it.filled_circle(59, 57, 3);
+          it.circle(70, 57, 3);
+
+          it.image(12, 0, id(thermometer));
+          it.printf(40, 12, id(font_24), "%.1f°C", id(htu21d_temperature).state);
+          it.image(12, 24, id(water));
+          it.printf(40, 36, id(font_24), "%.1f°C", id(htu21d_humidity).state);
+      - id: page2
+        # 温湿度
         lambda: >-
           it.line(0, 49, 128, 49);
           it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
@@ -150,8 +184,23 @@ display:
           it.image(12, 0, id(thermometer));
           it.printf(40, 12, id(font_24), "%.1f°C", id(temperature).state);
           it.image(12, 24, id(water));
+          it.printf(40, 36, id(font_24), "%.1f°C", id(temperature).state);
+      - id: page3
+        # 大气压 光强
+        lambda: >-
+          it.line(0, 49, 128, 49);
+          it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
+          it.printf(128, 51, id(font_14), TextAlign::RIGHT, "%.1f°", temperature);
+          it.circle(59, 57, 3);
+          it.filled_circle(70, 57, 3);
+
+          it.image(12, 24, id(water));
           it.printf(40, 36, id(font_24), "%.1f%%", id(humidity).state);
-      - id: page2
+  
+          it.printf(40, 12, id(font_24), "%.1f°C", id(now_temperature).state);
+          it.printf(40, 36, id(font_24), "%.0fAQI", id(now_aqi).state);
+      - id: page4
+        # 天气预报 室外温度 空气质量
         lambda: >-
           it.line(0, 49, 128, 49);
           it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
@@ -198,11 +247,13 @@ display:
           it.printf(40, 12, id(font_24), "%.1f°C", id(now_temperature).state);
           it.printf(40, 36, id(font_24), "%.0fAQI", id(now_aqi).state);
 interval:
+  # 自动翻页
   - interval: $delay
     then:
       - display.page.show_next: display
       - component.update: display
 binary_sensor:
+  # FLASH(IO0) 按钮翻页
   - platform: gpio
     id: button_1
     pin:

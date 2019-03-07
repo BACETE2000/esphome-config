@@ -1,5 +1,6 @@
 # Author by airijia.com
 # 三合一气象传感器模块 HTU21D+BMP180+BH1750
+# 增强版 带海拔和绝对湿度
 # 组装说明 http://airijia.com/doc/#/diy/nodemcu/3in1
 substitutions:
   # 把这三项改成你自己的设置
@@ -23,7 +24,19 @@ i2c:
   sda: D2
   scl: D1
   scan: False
-
+globals:
+  - id: sea
+    # 海平面大气压 单位hPa 根据所在位置查询值填写
+    type: float
+    initial_value: '1026.0'
+  - id: mw
+    # 水的摩尔质量 单位g/mol
+    type: float
+    initial_value: '18.01534'
+  - id: r
+    # 通用气体常数 单位J/mol/K
+    type: float
+    initial_value: '8.31447215'
 sensor:
   # HTU21D
   - platform: htu21d
@@ -50,3 +63,18 @@ sensor:
     address: 0x23
     resolution: 0.5
     update_interval: 60s
+  - platform: template
+    # 海拔高度 单位 m
+    name: $hostname Altitude
+    lambda: >-
+      return ((id(bmp180_temperature).state + 273.15) / 0.0065) *
+      (powf((id(sea) / id(bmp180_pressure).state), 0.190234) - 1) * -1; 
+    update_interval: 15s
+  - platform: template
+    # 绝对湿度 单位 grams/m^3
+    name: $hostname Absolute Humidity
+    lambda: >-
+      return (6.112 * powf(2.718281828, (17.67 * id(htu21d_temperature).state) /
+        (id(htu21d_temperature).state + 243.5)) * id(htu21d_humidity).state * id(mw)) /
+        ((273.15 + id(htu21d_temperature).state) * id(r)); 
+    update_interval: 15s
