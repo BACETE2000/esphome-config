@@ -47,6 +47,7 @@ sensor:
   # BH1750
   - platform: bh1750
     name: $hostname illuminance
+    id: bh1750_illuminance
     address: 0x23
     resolution: 0.5
     update_interval: 60s
