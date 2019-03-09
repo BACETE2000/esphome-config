@@ -1,0 +1,76 @@
+# Author by airijia.com
+# Dual 模块 接2个传统物理开关
+substitutions:
+  # 把这三项改成你自己的设置
+  hostname: '666'
+  ssid: 'airi'
+  password: 'airijia.com'
+esphome:
+  name: $hostname
+  platform: ESP8266
+  board: esp01_1m
+  board_flash_mode: dout
+wifi:
+  ssid: $ssid
+  password: $password
+  fast_connect: True
+api:
+  reboot_timeout: 0s
+ota:
+logger:
+
+status_led:
+  pin:
+    number: 13
+    inverted: True
+switch:
+  - platform: gpio
+    pin: 12
+    name: $hostname switch_1
+    id: relay_1
+  - platform: gpio
+    pin: 5
+    name: $hostname switch_2
+    id: relay_2
+binary_sensor:
+  - platform: gpio
+    id: button_1
+    pin:
+      number: 0
+      inverted: True
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle:
+            id: relay_1
+    on_release:
+      then:
+        - switch.toggle:
+            id: relay_1
+  - platform: gpio
+    id: button_2
+    pin: 
+      number: 9
+      inverted: True
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        - switch.toggle:
+            id: relay_2
+    on_release:
+      then:
+        - switch.toggle:
+            id: relay_2
+  - platform: gpio
+    id: button_c
+    pin:
+      number: 10
+      inverted: True
+      mode: INPUT_PULLUP
+    on_click:
+      then:
+        - switch.toggle:
+            id: relay_1            
+        - switch.toggle:
+            id: relay_2
+
