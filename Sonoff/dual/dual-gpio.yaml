@@ -1,5 +1,6 @@
 # Author by airijia.com
 # Dual 模块 接2个传统物理开关
+# button 0 和 1 分别接一个传统物理开关，button_c(外壳上的按钮) 同时控制两个继电器的开关
 substitutions:
   # 把这三项改成你自己的设置
   hostname: '666'
@@ -34,7 +35,7 @@ switch:
     id: relay_2
 binary_sensor:
   - platform: gpio
-    id: button_1
+    id: button_0
     pin:
       number: 0
       inverted: True
@@ -48,7 +49,7 @@ binary_sensor:
         - switch.toggle:
             id: relay_1
   - platform: gpio
-    id: button_2
+    id: button_1
     pin: 
       number: 9
       inverted: True
