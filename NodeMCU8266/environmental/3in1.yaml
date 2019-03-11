@@ -6,6 +6,9 @@ substitutions:
   hostname: '666'
   ssid: 'airi'
   password: 'airijia.com'
+  # I²C总线接线
+  SDA: D2
+  SCL: D1
 esphome:
   name: $hostname
   platform: ESP8266
@@ -20,8 +23,8 @@ ota:
 logger:
 
 i2c:
-  sda: D2
-  scl: D1
+  sda: $SDA
+  scl: $SCL
   scan: False
 
 sensor:

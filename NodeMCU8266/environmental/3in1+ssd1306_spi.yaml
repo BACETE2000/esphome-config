@@ -1,10 +1,10 @@
 # Author by airijia.com
 # 三合一气象传感器模块 HTU21D+BMP180+BH1750
-# + ssd1306 OLED 显示屏
+# + ssd1306 OLED 显示屏(SPI总线)
 # 组装说明 http://airijia.com/doc/#/diy/nodemcu/3in1
 substitutions:
   # 把这三项改成你自己的设置
-  hostname: '666'
+  hostname: '777'
   ssid: 'airi'
   password: 'airijia.com'
   # 翻页延迟
@@ -14,6 +14,12 @@ substitutions:
   # I²C总线接线
   SDA: D2
   SCL: D1
+  # SPI总线接线 OLED: NodeMCU
+  D0: D5
+  D1: D7
+  RES: D4
+  DC: D6
+  CS: D8
 esphome:
   name: $hostname
   platform: ESP8266
@@ -31,6 +37,9 @@ i2c:
   sda: $SDA
   scl: $SCL
   scan: False
+spi:
+  clk_pin: $D0
+  mosi_pin: $D1
 
 sensor:
   # HTU21D
@@ -91,11 +100,13 @@ font:
     size: 14
     glyphs: "0123456789:.-°|na"
 display:
-  - platform: ssd1306_i2c
+  - platform: ssd1306_spi
     model: "SSD1306 128x64"
-    address: 0x3C
-    update_interval: 60s
+    cs_pin: $CS
+    dc_pin: $DC
+    reset_pin: $RES
     rotation: $rotation
+    update_interval: 60s
     id: display
     pages:
       - id: page1
