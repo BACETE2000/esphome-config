@@ -31,4 +31,4 @@ sensor:
     name: $hostname illuminance_1
     address: 0x23
     resolution:  0.5
-    update_interval:  15s
+    update_interval: 60s
