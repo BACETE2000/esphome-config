@@ -1,13 +1,13 @@
 # Author by airijia.com
 # Basic 模块 点动功能 IO14/2 接物理开关
 substitutions:
-  # 把这三项改成你自己的设置
+  # Modify variables based on your own settings
   hostname: '666'
   ssid: 'airi'
   password: 'airijia.com'
-  # 点动延迟秒数
+  # inching delay period
   delay: 3s
-  # 旧版 14, 新版 2
+  # Extra gpio, R1=14, R2=2
   io: '2'
 esphome:
   name: $hostname
@@ -32,6 +32,7 @@ switch:
   - platform: gpio
     pin: 12
     id: relay_1
+    icon: "mdi:gate"
     on_turn_on:
       then:
         - delay: $delay

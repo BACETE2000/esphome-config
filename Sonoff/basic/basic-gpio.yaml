@@ -1,11 +1,11 @@
 # Author by airijia.com
-# Basic 模块基本功能(上电关) IO14/2 接物理开关
+# Basic
 substitutions:
-  # 把这三项改成你自己的设置
+  # Modify variables based on your own settings
   hostname: '666'
   ssid: 'airi'
   password: 'airijia.com'
-  # 旧版 14, 新版 2
+  # Extra gpio, R1=14, R2=2
   io: '2'
 esphome:
   name: $hostname
