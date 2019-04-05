@@ -1,0 +1,148 @@
+# Author by airijia.com
+# nodemcu + SSD1306 + 3in1
+substitutions:
+  # Modify variables based on your own settings
+  hostname: '666'
+  ssid: 'airi'
+  password: 'airijia.com'
+  timezone: 'America/Los_Angeles'
+  # I²C GPIO
+  SDA: D2
+  SCL: D1
+  # Carousel interval
+  interval: 5s
+  # Pin side down is 180°
+  rotation: 180°
+  # Slogan
+  S1L1: IRONMAN
+  S1L2: is the best!
+  S2L1: Thanos
+  S2L2: sucks
+
+esphome:
+  name: $hostname
+  platform: ESP8266
+  board: nodemcuv2
+wifi:
+  ssid: $ssid
+  password: $password
+  fast_connect: True
+api:
+  reboot_timeout: 0s
+ota:
+logger:
+
+i2c:
+  sda: $SDA
+  scl: $SCL
+  scan: False
+sensor:
+  # SHT30
+  - platform: sht3xd
+    temperature:
+      name: $hostname temperature
+      id: temperature
+    humidity:
+      name: $hostname humidity
+      id: humidity
+    address: 0x44
+    update_interval: 60s
+time:
+  - platform: homeassistant
+    id: hass_time
+    timezone: $timezone
+image:
+  - file: "mdi-thermometer.png"
+    id: thermometer
+    resize: 24x24
+  - file: "mdi-water-percent.png"
+    id: water
+    resize: 24x24
+font:
+  - file: "arialbd.ttf"
+    id: font_48
+    size: 48
+    glyphs: "0123456789:"
+  - file: "roboto.ttf"
+    id: font_24
+    size: 24
+  - file: "roboto.ttf"
+    id: font_14
+    size: 14
+    glyphs: "0123456789:.-°|na"
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3C
+    rotation: $rotation
+    id: display
+    pages:
+      - id: page1
+        # Slogan 1
+        lambda: >-
+          it.line(0, 49, 128, 49);
+          it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
+          it.printf(128, 51, id(font_14), TextAlign::RIGHT, "%.1f°", id(temperature).raw_state);
+          it.filled_circle(49, 57, 3);
+          it.circle(59, 57, 3);
+          it.circle(69, 57, 3);
+          it.circle(79, 57, 3);
+
+          it.print(0, 0, id(font_24), "$S1L1");
+          it.print(128, 24, id(font_24), TextAlign::TOP_RIGHT, "$S1L2");
+      - id: page2
+        # Slogan 2
+        lambda: >-
+          it.line(0, 49, 128, 49);
+          it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
+          it.printf(128, 51, id(font_14), TextAlign::RIGHT, "%.1f°", id(temperature).raw_state);
+          it.circle(49, 57, 3);
+          it.filled_circle(59, 57, 3);
+          it.circle(69, 57, 3);
+          it.circle(79, 57, 3);
+
+          it.print(0, 0, id(font_24), "$S2L1");
+          it.print(128, 24, id(font_24),  TextAlign::TOP_RIGHT, "$S2L2");
+      - id: page3
+        # Time
+        lambda: >-
+          it.line(0, 49, 128, 49);
+          it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
+          it.printf(128, 51, id(font_14), TextAlign::RIGHT, "%.1f°", id(temperature).raw_state);
+          it.circle(49, 57, 3);
+          it.circle(59, 57, 3);
+          it.filled_circle(69, 57, 3);
+          it.circle(79, 57, 3);
+
+          it.strftime(63, 24, id(font_48), TextAlign::CENTER, "%H:%M", id(hass_time).now());
+      - id: page4
+        # Temperature & Humidity
+        lambda: >-
+          it.line(0, 49, 128, 49);
+          it.strftime(0, 51, id(font_14), "%H:%M", id(hass_time).now());
+          it.printf(128, 51, id(font_14), TextAlign::RIGHT, "%.1f°", id(temperature).raw_state);
+          it.circle(49, 57, 3);
+          it.circle(59, 57, 3);
+          it.circle(69, 57, 3);
+          it.filled_circle(79, 57, 3);
+
+          it.image(6, 0, id(thermometer));
+          it.printf(37, 13, id(font_24), "%.1f°C", id(temperature).raw_state);
+          it.image(6, 24, id(water));
+          it.printf(37, 37, id(font_24), "%.1f%%", id(humidity).raw_state);
+interval:
+  - interval: $interval
+    then:
+      - display.page.show_next: display
+      - component.update: display
+binary_sensor:
+  - platform: gpio
+    id: button_1
+    pin:
+      number: 0
+      inverted: True
+      mode: INPUT_PULLUP
+    on_click:
+      then:
+        - display.page.show_next: display
+        - component.update: display
