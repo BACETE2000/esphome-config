@@ -11,8 +11,8 @@ esphome:
   platform: ESP32
   board: esp32dev
 wifi:
-  ssid: airi
-  password: airijia.com
+  ssid: $ssid
+  password: $password
   fast_connect: True
 api:
   reboot_timeout: 0s
