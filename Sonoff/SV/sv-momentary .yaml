@@ -30,14 +30,15 @@ status_led:
 switch:
   - platform: gpio
     pin: 12
-    id: relay
-  - platform: template
+    id: relay_1
     name: $name
     icon: $icon
-    turn_on_action:
-    - switch.turn_on: relay
-    - delay: $delay
-    - switch.turn_off: relay
+    on_turn_on:
+      then:
+        - delay: $delay
+        - switch.turn_off: relay_1
+        - lambda: >-
+            id(relay_1).publish_state(false);
 
 binary_sensor:
   - platform: gpio
@@ -48,6 +49,4 @@ binary_sensor:
       mode: INPUT_PULLUP
     on_click:
       then:
-        - switch.turn_on: relay
-        - delay: $delay
-        - switch.turn_off: relay
+        - switch.turn_on: relay_1
