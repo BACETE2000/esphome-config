@@ -1,5 +1,6 @@
 # Author by airijia.com
 # nodemcu + SSD1306 + 3in1
+# Video tutorial https://youtu.be/ePoAvQpmwhs
 substitutions:
   # Modify variables based on your own settings
   hostname: '666'

@@ -1,6 +1,7 @@
 # Author by airijia.com
 # ESP32-CAM
 # Lovelace camera card https://github.com/custom-cards/camera-card
+# Video tutorial https://youtu.be/-towjof_ixU
 substitutions:
   # Modify variables based on your own settings
   hostname: '666'
