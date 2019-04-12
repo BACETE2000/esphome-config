@@ -35,11 +35,12 @@ switch:
     icon: $icon
     on_turn_on:
       then:
+        # turn off after $delay
         - delay: $delay
         - switch.turn_off: relay_1
+        # publish off state to the frontend (hass)
         - lambda: >-
             id(relay_1).publish_state(false);
-
 binary_sensor:
   - platform: gpio
     id: button_0
