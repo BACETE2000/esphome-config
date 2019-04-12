@@ -6,7 +6,7 @@ substitutions:
   ssid: 'airi'
   password: 'airijia.com'
   # Switc
-  delay: 1500ms
+  delay: 500ms
   name: "Gate Remote"
   icon: "mdi:gate"
 esphome:
