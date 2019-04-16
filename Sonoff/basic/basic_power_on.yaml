@@ -2,7 +2,7 @@
 # Basic, Initialize the relay as ON on bootup
 # Related documents: https://esphome.io/components/switch/gpio.html
 substitutions:
-  # Modify variables based on your own settings
+  # Modify variables based on your settings
   hostname: '666'
   ssid: 'airi'
   password: 'airijia.com'

@@ -2,7 +2,7 @@
 # nodemcu + SSD1306 + 3in1
 # Video tutorial https://youtu.be/ePoAvQpmwhs
 substitutions:
-  # Modify variables based on your own settings
+  # Modify variables based on your settings
   hostname: '666'
   ssid: 'airi'
   password: 'airijia.com'

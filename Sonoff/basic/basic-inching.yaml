@@ -1,7 +1,7 @@
 # Author by airijia.com
 # Basic 模块 点动功能 IO14/2 接物理开关
 substitutions:
-  # Modify variables based on your own settings
+  # Modify variables based on your settings
   hostname: '666'
   ssid: 'airi'
   password: 'airijia.com'
