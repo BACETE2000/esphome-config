@@ -1,12 +1,15 @@
 # Author by airijia.com
 # ESP32-CAM
 # Lovelace camera card https://github.com/custom-cards/camera-card
-# Video tutorial https://youtu.be/-towjof_ixU
+# Video tutorial 
 substitutions:
   # Modify variables based on your settings
   hostname: '666'
   ssid: 'airi'
   password: 'airijia.com'
+  # I²C GPIO
+  SDA: GPIO14
+  SCL: GPIO15
 esphome:
   name: $hostname
   platform: ESP32
@@ -46,3 +49,36 @@ light:
   - platform: binary
     output: gpio_4
     name: $hostname light
+
+i2c:
+  sda: $SDA
+  scl: $SCL
+  scan: False
+
+sensor:
+  # HTU21D
+  - platform: htu21d
+    temperature:
+      name: $hostname htu21d temperature
+      id: htu21d_temperature
+    humidity:
+      name: $hostname humidity
+      id: htu21d_humidity
+    update_interval: 60s
+  # BMP180
+  - platform: bmp085
+    temperature:
+      name: $hostname bmp180 temperature
+      id: bmp180_temperature
+    pressure:
+      name: $hostname pressure
+      id: bmp180_pressure
+    address: 0x77
+    update_interval: 60s
+  # BH1750
+  - platform: bh1750
+    name: $hostname illuminance
+    id: bh1750_illuminance
+    address: 0x23
+    resolution: 0.5
+    update_interval: 60s
